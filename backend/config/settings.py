@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-v9de-w3%n@%4qm%w=$dn^pg18_k9gi_f-^o_(q^!edyixqpe9e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -38,19 +38,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Сторонние приложения
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    
+    'phonenumber_field',
+
     # Наши приложения
     'users',
     'anime',
-    # 'playlists',  # Добавим позже
-    # 'dubs',       # Добавим позже
-    # 'social',     # Добавим позже
-    # 'reactor',    # Добавим позже
+    'dubs',
+    'playlists',
+    'social',
+    'reactor',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -157,3 +159,35 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email settings для России
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'  # Или 'smtp.mail.ru' для Mail.ru
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'runos.d.hino@yandex.com'  # Замените на ваш email
+EMAIL_HOST_PASSWORD = 'nvbxswlmmgkrwbml'  # Пароль приложения
+DEFAULT_FROM_EMAIL = 'runos.d.hino@yandex.com'
+
+# Google OAuth
+GOOGLE_CLIENT_ID = '48556278554-stce35i0jtbe6gapbuvnho1h08m393l5.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+
+# Phone number settings
+PHONENUMBER_DEFAULT_REGION = 'RU'
+
+# Authentication settings
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Session settings for email verification and OAuth
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_SECURE = False  # Для локальной разработки
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# CSRF settings
+CSRF_COOKIE_SECURE = False  # Для локальной разработки
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'

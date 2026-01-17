@@ -1,22 +1,7 @@
 <template>
     <div class="home">
       <!-- Навигация -->
-      <nav class="navbar">
-        <div class="container">
-          <div class="nav-left">
-            <router-link to="/" class="logo">🎌 AnimeCore</router-link>
-            <div class="nav-links">
-              <router-link to="/" class="nav-link active">Главная</router-link>
-              <router-link to="/anime" class="nav-link">Аниме</router-link>
-              <router-link to="/playlists" class="nav-link">Плейлисты</router-link>
-            </div>
-          </div>
-          <div class="nav-right">
-            <router-link to="/login" class="btn btn-outline">Войти</router-link>
-            <router-link to="/register" class="btn btn-primary">Регистрация</router-link>
-          </div>
-        </div>
-      </nav>
+      <NavBar />
   
       <!-- Hero секция -->
       <section class="hero">
@@ -71,7 +56,7 @@
   </template>
   
   <script setup lang="ts">
-  // Компонент главной страницы
+  import NavBar from '@/components/NavBar.vue'
   </script>
   
   <style scoped>
@@ -92,9 +77,8 @@
   }
   
   .container {
-    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 max(var(--space-lg), 2vw);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -237,7 +221,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-    max-width: 1000px;
     margin: 0 auto;
   }
   

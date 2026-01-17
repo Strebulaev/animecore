@@ -248,8 +248,8 @@ class DubStudio(models.Model):
 
 class Dub(models.Model):
     """Озвучка конкретного аниме"""
-    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='dubs')
-    studio = models.ForeignKey(DubStudio, on_delete=models.CASCADE, related_name='dubs')
+    anime = models.ForeignKey(Anime, on_delete=models.CASCADE, related_name='anime_dubs')
+    studio = models.ForeignKey(DubStudio, on_delete=models.CASCADE, related_name='studio_dubs')
     
     # Информация об озвучке
     title = models.CharField(max_length=500, blank=True)  # "Озвучка AniMedia"

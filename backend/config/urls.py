@@ -19,17 +19,50 @@ from django.urls import path, include
 from django.http import JsonResponse
 import time
 
-def api_test(request):
+def api_status(request):
+    """Статус всех моделей в системе"""
+    from users.models import User
+    from anime.models import Anime, Genre
+    from playlists.models import Playlist, PlaylistItem
+    from dubs.models import DubGroup, Dub
+    from social.models import Comment, Group
+    from reactor.models import ReactorPost
+    from notifications.models import Complaint, Notification
+
     return JsonResponse({
         'status': 'ok',
-        'message': 'Django API работает!',
-        'timestamp': time.time()
+        'message': 'AnimeCore API работает!',
+        'timestamp': time.time(),
+        'models': {
+            'users': User.objects.count(),
+            'anime': Anime.objects.count(),
+            'genres': Genre.objects.count(),
+            'playlists': Playlist.objects.count(),
+            'playlist_items': PlaylistItem.objects.count(),
+            'dub_groups': DubGroup.objects.count(),
+            'dubs': Dub.objects.count(),
+            'comments': Comment.objects.count(),
+            'groups': Group.objects.count(),
+            'reactor_posts': ReactorPost.objects.count(),
+            'complaints': Complaint.objects.count(),
+            'notifications': Notification.objects.count(),
+        },
+        'endpoints': {
+            'anime': '/api/anime/',
+            'playlists': '/api/playlists/',
+            'users': '/api/users/',
+            'dubs': '/api/dubs/',
+            'social': '/api/social/',
+            'reactor': '/api/reactor/',
+            'notifications': '/api/notifications/',
+        }
     })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/test/', api_test),
-    path('api/auth/', include('users.urls')),  # Добавим позже
-    path('api/anime/', include('anime.urls')),  # Новый endpoint
-    path('api/dubs/', include('dubs.urls')),
+    path('api/status/', api_status),            # Статус системы
+    path('api/users/', include('users.urls')),  # Users API
+    path('api/anime/', include('anime.urls')),  # Anime API
+    path('api/dubs/', include('dubs.urls')),    # Dubs API
+    path('api/', include('playlists.urls')),    # Playlists API
 ]

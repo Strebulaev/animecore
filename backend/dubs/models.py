@@ -33,6 +33,15 @@ class DubGroup(models.Model):
     # Статус
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     is_verified = models.BooleanField(default=False)
+    verification_status = models.CharField(max_length=20, choices=[
+        ('pending', 'На проверке'),
+        ('verified', 'Верифицирована'),
+        ('rejected', 'Отклонена'),
+    ], default='pending')
+
+    # Рейтинги
+    rating = models.FloatField(default=0.0)  # Средний рейтинг
+    review_count = models.IntegerField(default=0)  # Количество отзывов
     
     # Время
     created_at = models.DateTimeField(auto_now_add=True)
@@ -52,7 +61,7 @@ class DubGroup(models.Model):
         return self.name
     
     def update_works_count(self):
-        self.works_count = self.dubs.count()
+        self.works_count = self.group_dubs.count()
         self.save()
 
 
@@ -111,8 +120,9 @@ class Dub(models.Model):
     ]
     
     # Связи
-    anime = models.ForeignKey('anime.Anime', on_delete=models.CASCADE, related_name='dubs')
-    group = models.ForeignKey(DubGroup, on_delete=models.CASCADE, related_name='dubs')
+    anime = models.ForeignKey('anime.Anime', on_delete=models.CASCADE, related_name='dubs_works')
+    group = models.ForeignKey(DubGroup, on_delete=models.CASCADE, related_name='group_dubs')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_dubs')
     
     # Информация об озвучке
     dub_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='full')

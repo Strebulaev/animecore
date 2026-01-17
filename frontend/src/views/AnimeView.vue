@@ -1,21 +1,7 @@
 <template>
     <div class="anime-view">
       <!-- Навигация -->
-      <nav class="navbar">
-        <div class="container">
-          <div class="nav-left">
-            <router-link to="/" class="logo">🎌 AnimeCore</router-link>
-            <div class="nav-links">
-              <router-link to="/" class="nav-link">Главная</router-link>
-              <router-link to="/anime" class="nav-link active">Аниме</router-link>
-              <router-link to="/playlists" class="nav-link">Плейлисты</router-link>
-            </div>
-          </div>
-          <div class="nav-right">
-            <router-link to="/login" class="btn btn-outline">Войти</router-link>
-          </div>
-        </div>
-      </nav>
+      <NavBar />
   
       <!-- Контент -->
       <div class="container main-content">
@@ -66,46 +52,12 @@
           </div>
   
           <div class="anime-grid">
-            <div
+            <AnimeCard
               v-for="item in filteredAnime"
               :key="item.id"
-              class="anime-card"
-              @click="goToAnimeDetail(item.id)"
-            >
-              <!-- Постер -->
-              <div class="anime-poster">
-                <div class="poster-placeholder">🎌</div>
-              </div>
-              
-              <!-- Информация -->
-              <div class="anime-info">
-                <h3 class="anime-title">{{ item.title_ru || item.title_en }}</h3>
-                
-                <div class="anime-meta">
-                  <span class="anime-year">{{ item.year }}</span>
-                  <span class="anime-episodes">{{ item.episodes }} эп.</span>
-                  <span :class="['anime-status', getStatusClass(item.status)]">
-                    {{ getStatusText(item.status) }}
-                  </span>
-                </div>
-                
-                <p class="anime-description">{{ truncateDescription(item.description) }}</p>
-                
-                <!-- Жанры -->
-                <div class="anime-genres">
-                  <span
-                    v-for="genre in item.genres.slice(0, 3)"
-                    :key="genre.id"
-                    class="genre-tag"
-                  >
-                    {{ genre.name }}
-                  </span>
-                  <span v-if="item.genres.length > 3" class="genre-more">
-                    +{{ item.genres.length - 3 }}
-                  </span>
-                </div>
-              </div>
-            </div>
+              :anime="item"
+              @click="goToAnimeDetail"
+            />
           </div>
         </div>
       </div>
@@ -116,6 +68,8 @@
   import { ref, computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import apiClient from '@/api/client'
+  import NavBar from '@/components/NavBar.vue'
+  import AnimeCard from '@/components/AnimeCard.vue'
   
   const router = useRouter()
   
@@ -216,8 +170,8 @@
   }
   
   // Переход к деталям
-  const goToAnimeDetail = (id: number) => {
-    router.push(`/anime/${id}`)
+  const goToAnimeDetail = (anime: any) => {
+    router.push(`/anime/${anime.id}`)
   }
   
   // Загрузка при монтировании
@@ -346,129 +300,60 @@
     gap: 1.5rem;
   }
   
-  /* Карточка аниме */
-  .anime-card {
-    background: white;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-  }
-  
-  .anime-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  }
-  
-  /* Постер */
-  .anime-poster {
-    height: 200px;
-    background: linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .poster-placeholder {
-    font-size: 4rem;
-    opacity: 0.8;
-  }
-  
-  /* Информация об аниме */
-  .anime-info {
-    padding: 1rem;
-  }
-  
-  .anime-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  
-  .anime-meta {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-bottom: 0.75rem;
-  }
-  
-  .anime-status {
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  
-  .status-ongoing {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  
-  .status-finished {
-    background-color: #f3f4f6;
-    color: #374151;
-  }
-  
-  .status-announced {
-    background-color: #dbeafe;
-    color: #1e40af;
-  }
-  
-  .anime-description {
-    font-size: 0.875rem;
-    color: #4b5563;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
-  /* Жанры */
-  .anime-genres {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-  }
-  
-  .genre-tag {
-    padding: 0.25rem 0.5rem;
-    background-color: #f3f4f6;
-    color: #4b5563;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-  }
-  
-  .genre-more {
-    font-size: 0.75rem;
-    color: #9ca3af;
-    align-self: center;
-  }
-  
   /* Адаптивность */
   @media (max-width: 640px) {
-    .container {
-      padding: 0 0.75rem;
+    .main-content {
+      padding: 1rem 0.5rem;
     }
-    
-    .nav-links {
-      display: none;
+
+    .page-header {
+      margin-bottom: 1.5rem;
     }
-    
+
+    .page-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .search-box {
+      max-width: 100%;
+    }
+
+    .filters {
+      gap: 0.375rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8125rem;
+    }
+
     .anime-grid {
       grid-template-columns: 1fr;
+      gap: 1rem;
     }
-    
-    .hero-title {
-      font-size: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    .main-content {
+      padding: 0.75rem 0.25rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .filters {
+      justify-content: center;
+    }
+
+    .filter-btn {
+      padding: 0.375rem 0.625rem;
+      font-size: 0.75rem;
+    }
+
+    .anime-grid {
+      gap: 0.75rem;
     }
   }
   </style>
