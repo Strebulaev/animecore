@@ -1,0 +1,28 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+.env
+venv/
+env/
+ENV/
+
+# Virtual Environment
+# Указываем конкретные папки в проекте
+backend/venv/
+frontend/venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

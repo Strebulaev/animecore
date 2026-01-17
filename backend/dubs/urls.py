@@ -1,0 +1,14 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import views
+
+router = DefaultRouter()
+router.register(r'groups', views.DubGroupViewSet, basename='dub-group')
+router.register(r'dubs', views.DubViewSet, basename='dub')
+router.register(r'actors', views.VoiceActorViewSet, basename='voice-actor')
+
+urlpatterns = [
+    path('', include(router.urls)),
+    path('anime/<int:anime_id>/dubs/', views.anime_dubs, name='anime-dubs'),
+    path('groups/popular/', views.popular_dub_groups, name='popular-dub-groups'),
+]
