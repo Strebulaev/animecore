@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosResponse, AxiosError } from 'axios'
 import router from '@/router'
 
-const baseURL = 'https://anisphere.ru'
+const baseURL = 'https://www.anisphere.ru'
 
 const apiClient = axios.create({
   baseURL,
