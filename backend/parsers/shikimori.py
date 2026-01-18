@@ -1,7 +1,9 @@
 import time
 import requests
+import re
 from typing import Dict, List, Optional
 from .base import BaseAnimeParser
+from .anilist import AnilistParser
 
 class ShikimoriParser(BaseAnimeParser):
     """Улучшенный парсер Shikimori"""
@@ -97,19 +99,41 @@ class ShikimoriParser(BaseAnimeParser):
     
     def normalize_anime_data(self, raw_data: Dict) -> Dict:
         """Нормализация данных Shikimori"""
+        # Обработка постера с fallback
+        poster_url = ''
+        if raw_data.get('image'):
+            if (raw_data['image'].get('original') and
+                raw_data['image']['original'] != '/assets/globals/missing_original.jpg'):
+                poster_url = f"https://shikimori.one{raw_data['image']['original']}"
+            elif raw_data['image'].get('x96'):
+                poster_url = f"https://shikimori.one{raw_data['image']['x96']}"
+            else:
+                # Попробовать получить с Anilist
+                title = raw_data.get('russian') or raw_data.get('name') or raw_data.get('english')
+                if title:
+                    anilist_parser = AnilistParser()
+                    alt_poster = anilist_parser.get_poster_url(title)
+                    if alt_poster:
+                        poster_url = alt_poster
+                    else:
+                        poster_url = '/missing_original.jpg'
+                else:
+                    poster_url = '/missing_original.jpg'
+
         normalized = {
             'id': raw_data.get('id'),
             'title_ru': raw_data.get('russian') or raw_data.get('name'),
             'title_en': raw_data.get('english') or raw_data.get('name'),
             'title_jp': raw_data.get('japanese'),
-            'description': raw_data.get('description', ''),
-            'poster_url': f"https://shikimori.one{raw_data['image']['original']}" if raw_data.get('image') else '',
+            'description': self._clean_description(raw_data.get('description', '')),
+            'poster_url': poster_url,
             'year': raw_data.get('aired_on', '').split('-')[0] if raw_data.get('aired_on') else None,
             'status': self._map_status(raw_data.get('status')),
             'episodes': raw_data.get('episodes'),
             'score': raw_data.get('score'),
             'genres': [{'name': g['russian'] or g['name']} for g in raw_data.get('genres', [])],
             'studios': [s['name'] for s in raw_data.get('studios', [])],
+            'screenshots': [{'url': s['original']} for s in raw_data.get('screenshots', [])],
             'raw': raw_data
         }
         
@@ -119,6 +143,20 @@ class ShikimoriParser(BaseAnimeParser):
         
         return normalized
     
+    def _clean_description(self, description: str) -> str:
+        """Очистка описания от BBCode тегов Shikimori"""
+        if not description:
+            return description
+
+        # Удалить [tag=...] и [/tag]
+        # Примеры: [person=62325 dustcell], [character=186854], [/character]
+        description = re.sub(r'\[/?\w+(=\w+)?[^\]]*\]', '', description)
+
+        # Удалить лишние пробелы
+        description = re.sub(r'\s+', ' ', description).strip()
+
+        return description
+
     def _map_status(self, status: str) -> str:
         mapping = {'released': 'finished', 'ongoing': 'ongoing', 'anons': 'announced'}
         return mapping.get(status, 'finished')

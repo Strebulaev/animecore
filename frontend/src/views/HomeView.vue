@@ -1,9 +1,5 @@
 <template>
     <div class="home">
-      <!-- Навигация -->
-      <NavBar />
-  
-      <!-- Hero секция -->
       <section class="hero">
         <div class="container">
           <h1 class="hero-title">Твоя вселенная <span>аниме</span></h1>
@@ -49,14 +45,14 @@
       <!-- Футер -->
       <footer class="footer">
         <div class="container">
-          <p>© 2024 AnimeCore. Аниме-соцсеть нового поколения.</p>
+          <p>© 2024 Анимяшка.</p>
         </div>
       </footer>
     </div>
   </template>
   
   <script setup lang="ts">
-  import NavBar from '@/components/NavBar.vue'
+
   </script>
   
   <style scoped>
@@ -174,12 +170,12 @@
   .hero {
     flex: 1;
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    padding: 4rem 1rem;
+    padding: 4rem 0;
     text-align: center;
   }
   
   .hero-title {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 800;
     color: #1f2937;
     margin-bottom: 1rem;
@@ -205,7 +201,7 @@
   
   /* Функции */
   .features {
-    padding: 4rem 1rem;
+    padding: 4rem 0;
     background: white;
   }
   
@@ -257,8 +253,19 @@
   .footer {
     background: #1f2937;
     color: #9ca3af;
-    padding: 1.5rem 1rem;
+    padding: 1.5rem 0;
     text-align: center;
     margin-top: auto;
   }
   </style>
+'   @media (min-width: 768px) {'  
+'     .hero-title {'  
+'       font-size: 3rem;'  
+'     }'  
+'   }'  
+''  
+'   @media (min-width: 1024px) {'  
+'     .hero-title {'  
+'       font-size: 3.5rem;'  
+'     }'  
+'   }' 

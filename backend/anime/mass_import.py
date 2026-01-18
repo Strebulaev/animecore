@@ -15,6 +15,7 @@ class MassAnimeImporter:
     """Массовый импортёр аниме"""
     
     def __init__(self, max_workers=20):
+        self.max_workers = max_workers
         self.parser = MultiSourceParser(max_workers=max_workers)
         self.session = requests.Session()
         self.session.headers.update({
@@ -33,23 +34,54 @@ class MassAnimeImporter:
         print("=" * 80)
         print("НАЧАЛО МАССОВОГО ИМПОРТА 100000+ АНИМЕ")
         print("=" * 80)
-        
+
         self.stats['start_time'] = datetime.now()
-        
+
         strategies = [
             self._strategy_popular_ids,      # 40000
             self._strategy_year_ranges,      # 30000
             self._strategy_genre_based,      # 20000
             self._strategy_random_ids,       # 10000
         ]
-        
+
         for strategy in strategies:
             try:
                 strategy()
             except Exception as e:
                 print(f"Ошибка в стратегии: {e}")
                 continue
-        
+
+        self.stats['end_time'] = datetime.now()
+        self._print_stats()
+
+    def import_ultra_fast(self):
+        """Ультра-быстрый импорт всех аниме подряд"""
+        print("=" * 80)
+        print("🚀 ULTRA FAST MODE: ИМПОРТ ВСЕХ АНИМЕ С SHIKIMORI")
+        print("=" * 80)
+
+        self.stats['start_time'] = datetime.now()
+
+        # Простая стратегия: все ID подряд от 1 до 500000
+        total_ids = 500000
+        batch_size = 1000  # Огромные батчи для скорости
+
+        print(f"🎯 Цель: {total_ids} аниме")
+        print(f"⚡ Режим: {self.max_workers} потоков, без задержек")
+
+        imported = 0
+        for start in range(1, total_ids + 1, batch_size):
+            end = min(start + batch_size - 1, total_ids)
+            ids = list(range(start, end + 1))
+
+            batch_imported = self._import_batch_ultra(ids)
+            imported += batch_imported
+
+            print(f"📊 Прогресс: {start}-{end} → Импортировано: {batch_imported} (Всего: {imported})")
+
+            if imported % 1000 == 0:
+                print(f"🎉 Достигнуто: {imported} аниме!")
+
         self.stats['end_time'] = datetime.now()
         self._print_stats()
     
@@ -229,10 +261,10 @@ class MassAnimeImporter:
             return 0
         
         # Многопоточная загрузка
-        with ThreadPoolExecutor(max_workers=10) as executor:
+        with ThreadPoolExecutor(max_workers=self.parser.max_workers) as executor:
             future_to_id = {
-                executor.submit(self._fetch_and_save, anime_id): anime_id 
-                for anime_id in new_ids[:100]  # Ограничиваем батч
+                executor.submit(self._fetch_and_save, anime_id): anime_id
+                for anime_id in new_ids[:200]  # Увеличенный батч
             }
             
             for future in as_completed(future_to_id):
@@ -247,7 +279,89 @@ class MassAnimeImporter:
                         print(f"    [ОШИБКИ] {self.stats['errors']} ошибок")
         
         return imported
-    
+
+    def _import_batch_ultra(self, anime_ids: List[int]) -> int:
+        """Ультра-быстрый импорт батча без задержек"""
+        imported = 0
+
+        # Фильтруем уже существующие
+        existing_ids = set(Anime.objects.filter(
+            shikimori_id__in=anime_ids
+        ).values_list('shikimori_id', flat=True))
+
+        new_ids = [aid for aid in anime_ids if aid not in existing_ids]
+
+        if not new_ids:
+            return 0
+
+        # Многопоточная загрузка без лимитов
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            future_to_id = {
+                executor.submit(self._fetch_and_save_ultra, anime_id): anime_id
+                for anime_id in new_ids
+            }
+
+            for future in as_completed(future_to_id):
+                anime_id = future_to_id[future]
+                try:
+                    success = future.result(timeout=5)  # Короткий таймаут
+                    if success:
+                        imported += 1
+                except Exception as e:
+                    pass  # Игнорируем ошибки в ultra mode
+
+        return imported
+
+    def _fetch_and_save_ultra(self, anime_id: int) -> bool:
+        """Ультра-быстрая загрузка без retry и задержек"""
+        try:
+            url = f"https://shikimori.one/api/animes/{anime_id}"
+            response = self.session.get(url, timeout=3)
+
+            if response.status_code == 404:
+                return False
+
+            response.raise_for_status()
+            data = response.json()
+
+            # Быстрое сохранение без транзакций
+            anime, created = Anime.objects.get_or_create(
+                shikimori_id=anime_id,
+                defaults={
+                    'title_ru': data.get('russian') or data.get('name'),
+                    'title_en': data.get('english') or data.get('name'),
+                    'title_jp': data.get('japanese'),
+                    'description': data.get('description', '')[:2000],
+                    'year': data.get('aired_on', '').split('-')[0] if data.get('aired_on') else None,
+                    'status': self._map_status(data.get('status')),
+                    'episodes': data.get('episodes'),
+                    'score': data.get('score'),
+                    'poster_url': f"https://shikimori.one{data['image']['original']}" if data.get('image') else '',
+                    'trailer_url': data.get('videos', [{}])[0].get('url', '') if data.get('videos') else '',
+                    'data_source': 'shikimori'
+                }
+            )
+
+            if created:
+                # Жанры добавляем отдельно если нужно
+                if data.get('genres'):
+                    for genre_data in data['genres']:
+                        genre_name = genre_data.get('russian') or genre_data.get('name')
+                        if genre_name:
+                            genre, _ = Genre.objects.get_or_create(
+                                name=genre_name,
+                                defaults={'slug': genre_name.lower().replace(' ', '-')}
+                            )
+                            anime.genres.add(genre)
+
+                print(f"✅ {anime.title_ru or anime.title_en} (ID: {anime_id})")
+                return True
+
+            return False
+
+        except Exception as e:
+            return False
+
     def _fetch_and_save(self, anime_id: int) -> bool:
         """Получить и сохранить одно аниме"""
         try:
@@ -274,6 +388,7 @@ class MassAnimeImporter:
                         'episodes': data.get('episodes'),
                         'score': data.get('score'),
                         'poster_url': f"https://shikimori.one{data['image']['original']}" if data.get('image') else '',
+                        'trailer_url': data.get('videos', [{}])[0].get('url', '') if data.get('videos') else '',
                         'data_source': 'shikimori'
                     }
                 )
@@ -288,9 +403,12 @@ class MassAnimeImporter:
                             )
                             anime.genres.add(genre)
             
-            time.sleep(0.1)  # Задержка между запросами
+            if created:
+                print(f"✅ Imported: {anime.title_ru or anime.title_en} (ID: {anime_id})")
+
+            time.sleep(0.002)  # Умеренная задержка
             return created
-            
+
         except Exception as e:
             if "429" in str(e):  # Rate limit
                 time.sleep(5)

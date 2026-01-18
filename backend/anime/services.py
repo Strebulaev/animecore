@@ -38,6 +38,7 @@ class AnimeImportService:
                     'episodes': data['episodes'],
                     'score': data['score'],
                     'poster_url': data['poster_url'],
+                    'screenshots': data.get('screenshots'),
                     'data_source': 'shikimori'
                 }
             )

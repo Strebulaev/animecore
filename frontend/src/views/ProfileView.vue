@@ -1,8 +1,5 @@
 <template>
   <div class="profile-page">
-    <!-- Навигация -->
-    <NavBar />
-
     <div class="container profile-container">
       <div class="profile-header">
         <div class="user-avatar-large">

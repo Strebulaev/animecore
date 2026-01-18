@@ -1,80 +1,80 @@
 <template>
-  <nav class="navbar">
-    <div class="container">
-      <div class="nav-left">
-        <router-link to="/" class="logo">🎌 AnimeCore</router-link>
-        <div class="nav-links desktop-nav">
-          <router-link to="/" class="nav-link" :class="{ active: $route.path === '/' }">
+  <nav class="bg-white shadow-sm py-4 sticky top-0 z-50">
+    <div class="container flex justify-between items-center">
+      <div class="flex items-center gap-8">
+        <router-link to="/" class="text-2xl font-bold text-blue-600 no-underline">🎌 Анимяшка</router-link>
+        <div class="hidden md:flex gap-6">
+          <router-link to="/" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors no-underline" :class="{ 'text-blue-600 font-semibold': $route.path === '/' }">
             Главная
           </router-link>
-          <router-link to="/anime" class="nav-link" :class="{ active: $route.path.startsWith('/anime') }">
+          <router-link to="/anime" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors no-underline" :class="{ 'text-blue-600 font-semibold': $route.path.startsWith('/anime') }">
             Аниме
           </router-link>
-          <router-link to="/playlists" class="nav-link" :class="{ active: $route.path.startsWith('/playlists') }">
+          <router-link to="/playlists" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors no-underline" :class="{ 'text-blue-600 font-semibold': $route.path.startsWith('/playlists') }">
             Плейлисты
           </router-link>
         </div>
       </div>
 
-      <div class="nav-right">
+      <div class="flex items-center gap-4">
         <!-- Для неавторизованных пользователей -->
         <template v-if="!authStore.isAuthenticated">
-          <router-link to="/login" class="btn btn-outline hidden-sm-down">Войти</router-link>
-          <router-link to="/register" class="btn btn-primary hidden-sm-down">Регистрация</router-link>
+          <router-link to="/login" class="hidden md:inline-block text-gray-600 border border-gray-300 bg-white hover:bg-gray-50 px-4 py-2 rounded-md transition-colors no-underline">Войти</router-link>
+          <router-link to="/register" class="hidden md:inline-block bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors no-underline">Регистрация</router-link>
         </template>
 
         <!-- Для авторизованных пользователей -->
         <template v-else>
-          <router-link to="/profile" class="nav-link hidden-sm-down" :class="{ active: $route.path === '/profile' }">
+          <router-link to="/profile" class="hidden md:inline-block text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors no-underline" :class="{ 'text-blue-600 font-semibold': $route.path === '/profile' }">
             Аккаунт
           </router-link>
-          <button @click="handleLogout" class="btn btn-outline logout-btn hidden-sm-down">
+          <button @click="handleLogout" class="hidden md:inline-block text-red-600 border border-red-600 bg-white hover:bg-red-50 px-4 py-2 rounded-md transition-colors">
             Выйти
           </button>
         </template>
 
         <!-- Hamburger menu button -->
         <button
-          class="hamburger-btn hidden-md-up"
+          class="md:hidden flex flex-col justify-center items-center w-8 h-8 bg-transparent border-none cursor-pointer"
           @click="toggleMobileMenu"
-          :class="{ active: isMobileMenuOpen }"
+          :class="{ 'open': isMobileMenuOpen }"
           aria-label="Toggle menu"
         >
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
+          <span class="w-full h-0.5 bg-gray-600 mb-1 transition-transform"></span>
+          <span class="w-full h-0.5 bg-gray-600 mb-1 transition-opacity"></span>
+          <span class="w-full h-0.5 bg-gray-600 transition-transform"></span>
         </button>
       </div>
     </div>
 
     <!-- Mobile menu -->
-    <div class="mobile-menu" :class="{ open: isMobileMenuOpen }">
-      <div class="mobile-menu-content">
-        <div class="mobile-nav-links">
-          <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu" :class="{ active: $route.path === '/' }">
+    <div class="md:hidden absolute top-full left-0 right-0 bg-white shadow-md transform transition-transform" :class="{ '-translate-y-full opacity-0 pointer-events-none': !isMobileMenuOpen, 'translate-y-0 opacity-100': isMobileMenuOpen }">
+      <div class="px-4 py-6">
+        <div class="space-y-2">
+          <router-link to="/" class="block text-gray-600 hover:text-blue-600 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu" :class="{ 'text-blue-600 bg-gray-50': $route.path === '/' }">
             Главная
           </router-link>
-          <router-link to="/anime" class="mobile-nav-link" @click="closeMobileMenu" :class="{ active: $route.path.startsWith('/anime') }">
+          <router-link to="/anime" class="block text-gray-600 hover:text-blue-600 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu" :class="{ 'text-blue-600 bg-gray-50': $route.path.startsWith('/anime') }">
             Аниме
           </router-link>
-          <router-link to="/playlists" class="mobile-nav-link" @click="closeMobileMenu" :class="{ active: $route.path.startsWith('/playlists') }">
+          <router-link to="/playlists" class="block text-gray-600 hover:text-blue-600 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu" :class="{ 'text-blue-600 bg-gray-50': $route.path.startsWith('/playlists') }">
             Плейлисты
           </router-link>
         </div>
 
-        <div class="mobile-auth">
+        <div class="mt-6 pt-4 border-t border-gray-200 space-y-3">
           <!-- Для неавторизованных пользователей -->
           <template v-if="!authStore.isAuthenticated">
-            <router-link to="/login" class="mobile-btn btn-outline" @click="closeMobileMenu">Войти</router-link>
-            <router-link to="/register" class="mobile-btn btn-primary" @click="closeMobileMenu">Регистрация</router-link>
+            <router-link to="/login" class="block text-center text-gray-600 border border-gray-300 bg-white hover:bg-gray-50 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu">Войти</router-link>
+            <router-link to="/register" class="block text-center bg-blue-600 text-white border border-blue-600 hover:bg-blue-700 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu">Регистрация</router-link>
           </template>
 
           <!-- Для авторизованных пользователей -->
           <template v-else>
-            <router-link to="/profile" class="mobile-nav-link" @click="closeMobileMenu" :class="{ active: $route.path === '/profile' }">
+            <router-link to="/profile" class="block text-gray-600 hover:text-blue-600 py-3 px-4 rounded-md transition-colors no-underline" @click="closeMobileMenu" :class="{ 'text-blue-600 bg-gray-50': $route.path === '/profile' }">
               Аккаунт
             </router-link>
-            <button @click="handleLogoutAndClose" class="mobile-btn btn-outline logout">
+            <button @click="handleLogoutAndClose" class="block w-full text-center text-red-600 border border-red-600 bg-white hover:bg-red-50 py-3 px-4 rounded-md transition-colors">
               Выйти
             </button>
           </template>
@@ -370,6 +370,24 @@ onMounted(() => {
 }
 
 /* Responsive breakpoints */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 4rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    padding: 0 6rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container {
+    padding: 0 8rem;
+  }
+}
+
 @media (max-width: 768px) {
   .desktop-nav {
     display: none;

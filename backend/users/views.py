@@ -105,6 +105,8 @@ class LoginView(APIView):
             )
             if user:
                 login(request, user)
+                user.is_online = True
+                user.save()
                 refresh = RefreshToken.for_user(user)
                 update_last_login(None, user)
 
@@ -192,6 +194,8 @@ class GoogleAuthView(APIView):
                     user.save()
 
                 login(request, user)
+                user.is_online = True
+                user.save()
                 refresh = RefreshToken.for_user(user)
                 update_last_login(None, user)
 
@@ -293,6 +297,8 @@ class GoogleAuthCallbackView(APIView):
                 user.save()
 
             login(request, user)
+            user.is_online = True
+            user.save()
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
 
@@ -429,6 +435,10 @@ class LogoutView(APIView):
     """Выход из системы"""
 
     def post(self, request):
+        user = request.user
+        if user.is_authenticated:
+            user.is_online = False
+            user.save()
         logout(request)
         return Response({'message': 'Выход выполнен'})
 

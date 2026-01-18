@@ -46,6 +46,8 @@ class BulkImportManager(Manager):
                     values.append(row)
                 
                 cursor.executemany(sql, values)
+                for obj in batch:
+                    print(f"✅ Bulk imported: {obj.title_ru or obj.title_en or f'ID:{obj.shikimori_id}'}")
                 print(f"Вставлено {i+len(batch)}/{len(objs)} записей")
 
                 
@@ -122,11 +124,20 @@ class Anime(models.Model):
     # Изображения
     poster_url = models.URLField(max_length=1000, blank=True)
     poster_file = models.ImageField(upload_to='anime/posters/', null=True, blank=True)
+
+    # Трейлер
+    trailer_url = models.URLField(max_length=1000, blank=True)
+
+    # Скриншоты
+    screenshots = models.JSONField(null=True, blank=True)  # List of URLs
     
     # Связи
     genres = models.ManyToManyField(Genre, related_name='anime', blank=True)
     studios = models.ManyToManyField(Studio, related_name='anime', blank=True)
     
+    # Поисковый текст
+    search_text = models.TextField(blank=True, db_index=True)
+
     # Технические поля
     data_source = models.CharField(max_length=100, default='shikimori')
     approved = models.BooleanField(default=True)
@@ -144,6 +155,7 @@ class Anime(models.Model):
             models.Index(fields=['year']),
             models.Index(fields=['status']),
             models.Index(fields=['score']),
+            models.Index(fields=['search_text']),
         ]
     
     def save(self, *args, **kwargs):
@@ -152,11 +164,14 @@ class Anime(models.Model):
             base = self.title_ru or self.title_en or str(self.shikimori_id)
             if base:
                 self.slug = slugify(base)
-        
+
         # Определяем год из даты
         if self.aired_from and not self.year:
             self.year = self.aired_from.year
-        
+
+        # Создаем поисковый текст
+        self.search_text = f"{self.title_ru or ''} {self.title_en or ''} {self.title_jp or ''}".strip().lower()
+
         super().save(*args, **kwargs)
     
     def __str__(self):

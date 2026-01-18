@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: AnimeView
     },
     {
       path: '/anime',
@@ -19,6 +19,21 @@ const router = createRouter({
       path: '/anime/:id',
       name: 'anime-detail',
       component: () => import('../views/AnimeDetailView.vue')
+    },
+    {
+      path: '/playlists',
+      name: 'playlists',
+      component: () => import('../views/PlaylistsView.vue')
+    },
+    {
+      path: '/groups',
+      name: 'groups',
+      component: () => import('../views/GroupsView.vue')
+    },
+    {
+      path: '/reactor',
+      name: 'reactor',
+      component: () => import('../views/ReactorView.vue')
     },
     {
       path: '/login',

@@ -344,15 +344,12 @@ const submitForm = async () => {
 .add-link-btn {
   background: #10b981;
   color: white;
-  border: none;
+  aspect-ratio: 1;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   font-size: 16px;
+  cursor: pointer;
   font-weight: bold;
   transition: background 0.2s;
 }

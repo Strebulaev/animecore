@@ -1,11 +1,5 @@
 <template>
     <div class="auth-page">
-      <nav class="navbar">
-        <div class="container">
-          <router-link to="/" class="logo">🎌 AnimeCore</router-link>
-        </div>
-      </nav>
-  
       <div class="container auth-container">
         <div class="auth-card">
           <h2>Регистрация</h2>
@@ -95,9 +89,11 @@
   <script setup lang="ts">
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/auth'
   import apiClient from '@/api/client'
 
   const router = useRouter()
+  const authStore = useAuthStore()
   const loading = ref(false)
   const error = ref('')
   const success = ref('')
@@ -133,22 +129,23 @@
         password: form.value.password
       }
 
-      const response = await apiClient.post('/users/register/', registerData)
+      await apiClient.post('/users/register/', registerData)
 
-      success.value = 'Регистрация успешна! Проверьте email для подтверждения.'
+      // Автоматический вход после регистрации
+      const loginResult = await authStore.login(form.value.username, form.value.password)
 
-      // Очищаем форму
-      form.value = {
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+      if (loginResult.success) {
+        success.value = 'Регистрация успешна! Вы вошли в аккаунт.'
+        // Перенаправляем на главную
+        setTimeout(() => {
+          router.push('/')
+        }, 2000)
+      } else {
+        error.value = 'Регистрация прошла успешно, но не удалось войти. Попробуйте войти вручную.'
+        setTimeout(() => {
+          router.push('/login')
+        }, 3000)
       }
-
-      // Через 3 секунды перенаправляем на страницу входа
-      setTimeout(() => {
-        router.push('/login')
-      }, 3000)
 
     } catch (err: any) {
       if (err.response?.data) {

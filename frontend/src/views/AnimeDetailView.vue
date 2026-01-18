@@ -7,9 +7,7 @@
         :editing-dub="editingDub"
         @close="showAddDubModal = false"
         @dub-added="onDubAdded"
-      />
-      <NavBar />
-  
+      />  
       <div class="container detail-content">
         <div v-if="loading" class="loading-state">
           <div class="spinner"></div>
@@ -102,7 +100,19 @@
               {{ anime.description || 'Описание отсутствует' }}
             </p>
           </div>
-  
+          <div class="anime-screenshots-section" v-if="anime.screenshots && anime.screenshots.length > 0">
+            <h3>📸 Скриншоты</h3>
+            <div class="screenshots-grid">
+              <img
+                v-for="(screenshot, index) in anime.screenshots"
+                :key="index"
+                :src="screenshot.url"
+                :alt="`Скриншот ${index + 1}`"
+                class="screenshot-image"
+                @click="openLightbox(screenshot.url)"
+              >
+            </div>
+          </div>
           <!-- Разделы -->
           <div class="anime-sections">
             <!-- Где смотреть -->
@@ -198,6 +208,8 @@
     episodes: number | null
     score: number | null
     poster_url: string | null
+    trailer_url: string | null
+    screenshots: {url: string}[] | null
     genres: Genre[]
     playlists?: Playlist[]
   }
@@ -245,6 +257,20 @@
       total_episodes: dub.total_episodes,
       is_complete: dub.is_complete
     }))
+  })
+
+  // Обработка URL трейлера для embed
+  const trailerEmbedUrl = computed(() => {
+    if (!anime.value?.trailer_url) return null
+    const url = anime.value.trailer_url
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1]?.split('&')[0]
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`
+    } else if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0]
+      if (videoId) return `https://www.youtube.com/embed/${videoId}`
+    }
+    return url // Если не YouTube, вернуть как есть
   })
   
   const getStatusText = (status: string) => {
@@ -352,6 +378,10 @@
     fetchDubs()
     editingDub.value = null
   }
+
+  const openLightbox = (url: string) => {
+    window.open(url, '_blank')
+  }
   
   onMounted(async () => {
     await fetchAnime()
@@ -412,7 +442,71 @@
     border-radius: 1rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
-  
+    /* Скриншоты */
+  .anime-screenshots-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .anime-screenshots-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .screenshot-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .screenshot-image:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 640px) {
+    .anime-screenshots-section {
+      padding: 1rem;
+    }
+
+    .screenshots-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .screenshot-image {
+      height: 120px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .anime-screenshots-section {
+      padding: 0.75rem;
+    }
+
+    .screenshots-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .screenshot-image {
+      height: 100px;
+    }
+  }
+
   @media (max-width: 768px) {
     .detail-content {
       padding: 1rem 0.5rem;

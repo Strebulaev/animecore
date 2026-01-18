@@ -14,5 +14,5 @@ class AnimeSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title_ru', 'title_en', 'title_jp',
             'description', 'year', 'status', 'episodes',
-            'score', 'poster_url', 'genres', 'created_at'
+            'score', 'poster_url', 'trailer_url', 'genres', 'created_at'
         ]

@@ -17,6 +17,9 @@ class User(AbstractUser):
     # OAuth поля
     google_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name=_('Google ID'))
 
+    # Статус онлайн
+    is_online = models.BooleanField(default=False, verbose_name=_('Is online'))
+
     # Для SMS верификации
     sms_code = models.CharField(max_length=6, blank=True, null=True, verbose_name=_('SMS verification code'))
     sms_code_expires = models.DateTimeField(blank=True, null=True, verbose_name=_('SMS code expiration'))
@@ -25,7 +28,7 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.username or self.email or str(self.phone_number) or f'User {self.id}'

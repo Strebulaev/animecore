@@ -1,11 +1,5 @@
 <template>
     <div class="auth-page">
-      <nav class="navbar">
-        <div class="container">
-          <router-link to="/" class="logo">🎌 AnimeCore</router-link>
-        </div>
-      </nav>
-  
       <div class="container auth-container">
         <div class="auth-card">
           <h2>Вход в аккаунт</h2>

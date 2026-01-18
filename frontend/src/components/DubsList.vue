@@ -952,16 +952,12 @@ onMounted(() => {
 }
 
 .play-btn {
-  width: 32px;
-  height: 32px;
   background: #007bff;
-  border: none;
+  aspect-ratio: 1;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 20px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: bold;
 }
 
 .play-btn:hover {
@@ -969,15 +965,15 @@ onMounted(() => {
 }
 
 .play-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   fill: white;
 }
 
 .details-btn {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid #007bff;
+  border: 1px solid ;
   color: #007bff;
   border-radius: 6px;
   font-size: 0.85rem;
