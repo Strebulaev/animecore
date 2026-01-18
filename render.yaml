@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: animecore-backend
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: animecore-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: animecore-backend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://your-vercel-domain.vercel.app
+    autoDeploy: true
+
+  - type: pserv
+    name: animecore-db
+    env: postgres
+    autoDeploy: false
+
+databases:
+  - name: animecore-db
+    databaseName: animecore
+    user: animecore
