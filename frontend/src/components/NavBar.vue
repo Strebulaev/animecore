@@ -2,7 +2,7 @@
   <nav class="bg-white shadow-sm py-4 sticky top-0 z-50">
     <div class="container flex justify-between items-center">
       <div class="flex items-center gap-8">
-        <router-link to="/" class="text-2xl font-bold text-blue-600 no-underline">🎌 Анимяшка</router-link>
+        <router-link to="/" class="text-2xl font-bold text-blue-600 no-underline">AniSphere</router-link>
         <div class="hidden md:flex gap-6">
           <router-link to="/" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md transition-colors no-underline" :class="{ 'text-blue-600 font-semibold': $route.path === '/' }">
             Главная

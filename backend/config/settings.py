@@ -43,16 +43,16 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    'phonenumber_field',
+    # 'phonenumber_field',
 
     # Наши приложения
     'users',
     'anime',
-    'dubs',
+    # 'dubs',
     'playlists',
-    'social',
-    'reactor',
-    'notifications',
+    # 'social',
+    # 'reactor',
+    # 'notifications',
 ]
 
 MIDDLEWARE = [

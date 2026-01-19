@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from phonenumber_field.modelfields import PhoneNumberField
+# from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
@@ -10,9 +10,9 @@ class User(AbstractUser):
     bio = models.TextField(max_length=500, blank=True)
 
     # Поля для аутентификации
-    phone_number = PhoneNumberField(unique=True, null=True, blank=True, verbose_name=_('Phone number'))
+    phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone number'))
     email_verified = models.BooleanField(default=False, verbose_name=_('Email verified'))
-    phone_verified = models.BooleanField(default=False, verbose_name=_('Phone verified'))
+    # phone_verified = models.BooleanField(default=False, verbose_name=_('Phone verified'))
 
     # OAuth поля
     google_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name=_('Google ID'))

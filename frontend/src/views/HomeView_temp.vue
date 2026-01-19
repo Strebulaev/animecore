@@ -46,7 +46,7 @@
       <!-- Футер -->
       <footer class="footer">
         <div class="container">
-          <p>© 2024 Анимяшка.</p>
+          <p>© 2024 AniSphere.</p>
         </div>
       </footer>
     </div>

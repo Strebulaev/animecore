@@ -21,7 +21,7 @@ class PlaylistItem(models.Model):
     anime = models.ForeignKey('anime.Anime', on_delete=models.CASCADE)
     episode_number = models.IntegerField(null=True, blank=True)
     source_url = models.URLField()
-    dub_studio = models.ForeignKey('dubs.DubGroup', on_delete=models.SET_NULL, null=True, blank=True)
+    # dub_studio = models.ForeignKey('dubs.DubGroup', on_delete=models.SET_NULL, null=True, blank=True)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

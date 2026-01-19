@@ -21,7 +21,7 @@ import time
 
 def api_status(request):
     """Статус всех моделей в системе"""
-    from users.models import User
+    # from users.models import User
     from anime.models import Anime, Genre
     from playlists.models import Playlist, PlaylistItem
     from dubs.models import DubGroup, Dub
@@ -34,23 +34,23 @@ def api_status(request):
         'message': 'AnimeCore API работает!',
         'timestamp': time.time(),
         'models': {
-            'users': User.objects.count(),
+            # 'users': User.objects.count(),
             'anime': Anime.objects.count(),
             'genres': Genre.objects.count(),
-            'playlists': Playlist.objects.count(),
-            'playlist_items': PlaylistItem.objects.count(),
-            'dub_groups': DubGroup.objects.count(),
-            'dubs': Dub.objects.count(),
-            'comments': Comment.objects.count(),
-            'groups': Group.objects.count(),
-            'reactor_posts': ReactorPost.objects.count(),
-            'complaints': Complaint.objects.count(),
-            'notifications': Notification.objects.count(),
+            # 'playlists': Playlist.objects.count(),
+            # 'playlist_items': PlaylistItem.objects.count(),
+            # 'dub_groups': DubGroup.objects.count(),
+            # 'dubs': Dub.objects.count(),
+            # 'comments': Comment.objects.count(),
+            # 'groups': Group.objects.count(),
+            # 'reactor_posts': ReactorPost.objects.count(),
+            # 'complaints': Complaint.objects.count(),
+            # 'notifications': Notification.objects.count(),
         },
         'endpoints': {
             'anime': '/api/anime/',
             'playlists': '/api/playlists/',
-            'users': '/api/users/',
+            # 'users': '/api/users/',
             'dubs': '/api/dubs/',
             'social': '/api/social/',
             'reactor': '/api/reactor/',
@@ -61,8 +61,9 @@ def api_status(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/status/', api_status),            # Статус системы
-    path('api/users/', include('users.urls')),  # Users API
+    # path('api/users/', include('users.urls')),  # Users API
     path('api/anime/', include('anime.urls')),  # Anime API
     path('api/dubs/', include('dubs.urls')),    # Dubs API
     path('api/', include('playlists.urls')),    # Playlists API
+    # path('api/social/', include('social.urls')), # Social API
 ]
